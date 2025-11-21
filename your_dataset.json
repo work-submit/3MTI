@@ -1,0 +1,14 @@
+{
+    "train": {
+        "target_image": "path_to_target_high_resolution_thermal_image_folder",
+        "image": "path_to_degraded_low_resolution_thermal_image_folder",
+        "ref_image": "path_to_reference_high_resolution_RGB_image_folder",
+        "prompt": "remove degradation"
+    },
+    "test": {
+        "target_image": "path_to_target_high_resolution_thermal_image_folder",
+        "image": "path_to_degraded_low_resolution_thermal_image_folder",
+        "ref_image": "path_to_reference_high_resolution_RGB_image_folder",
+        "prompt": "remove degradation"
+    }
+}
