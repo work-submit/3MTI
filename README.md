@@ -12,7 +12,7 @@ pip install -r requirements.txt
 ## Dataset preparation
 Prepare your training set and test set in the following JSON format
 ```json
-data = {
+{
     "train": {
         "target_image": "path_to_target_high_resolution_thermal_image_folder",
         "image": "path_to_degraded_low_resolution_thermal_image_folder",
