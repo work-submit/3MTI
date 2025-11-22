@@ -58,7 +58,7 @@ XXXXX.png: word1, word2, word3, ...
 
 ## Inference
 #### Step 1: Download the pretrained model
-- Download the 3MTI model weight from ...
+- Download the 3MTI model weight from.
 You can put these models into `preset/models`.
 #### Step 2: Modify path
 - Replace lines 90 and 91 of inference_3MTI.py with your actual prompt text path.
