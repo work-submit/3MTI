@@ -29,7 +29,7 @@ Prepare your training set and test set in the following JSON format:
     }
 }
 ```
-
+#### Step 1:
 ```
 cd dataset
 python create_json.py
@@ -50,8 +50,26 @@ python semantic_extract.py
 ```
 Your prompt.txt content should be formatted as follows:
 ```
-00001.png: word1, word2, ...
-00002.png: word1, word2, ...
+00001.png: word1, word2, word3, ...
+00002.png: word1, word2, word3, ...
 ...
-XXXXX.png: word1, word2, ...
+XXXXX.png: word1, word2, word3, ...
+```
+
+## Inference
+#### Step 1: Download the pretrained model
+- Download the 3MTI model weight from ...
+You can put these models into `preset/models`.
+#### Step 2: Modify path
+- Replace lines 90 and 91 of inference_3MTI.py with your actual prompt text path.
+- Replace paths in the running command.
+#### Step 3: Inference and save results
+```
+python inference_3MTI.py \
+--model_path "path_to/trained_model/model.pkl" \
+--input_image "path_to_your_low_resoluton_thermal_image_folder" \
+--ref_image "path_to_your_high_resoluton_reference_RGB_image_folder" \
+--prompt "remove degradation" \
+--output_dir "path_to_inference_output_folder" \
+--mv_unet
 ```
