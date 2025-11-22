@@ -76,7 +76,7 @@ python inference_3MTI.py \
 #### Step 1: Modify path
 - Replace lines 101 and 104 of train_3MTI.py with your actual prompt text path.
 #### Step 2: training
-# Single GPU
+#### Single GPU
 ```bash
 accelerate launch --mixed_precision=bf16 train_3MTI.py \
     --output_dir="path_to/saved_weights" \
@@ -89,7 +89,7 @@ accelerate launch --mixed_precision=bf16 train_3MTI.py \
     --lambda_lpips 1.0 --lambda_l2 1.0 --lambda_gram 1.0 --gram_loss_warmup_steps 2000 \
     --tracker_project_name "difix" --tracker_run_name "train" --timestep 199 --mv_unet
 ```
-# Multipe GPUs
+#### Multipe GPUs
 ```bash
 export NUM_NODES=1
 export NUM_GPUS=8
