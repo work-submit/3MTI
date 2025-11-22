@@ -1,16 +1,16 @@
 # 3MTI
 3M-TI: High-Quality Mobile Thermal Imaging via Calibration-free Multi-Camera Cross-Modal Diffusion
 
-## Framework Overview
+## 🔎Framework Overview
 ![3MTI](fig/fig_3m-ti.png)
 
-## Qualitative Results on Synthetic Dataset
+## 📚Qualitative Results on Synthetic Dataset
 ![3MTI](fig/sota.png)
 
-## Qualitative Results on Mobile Imaging System
+## 📷Qualitative Results on Mobile Imaging System
 ![3MTI](fig/val.png)
 
-## Setup
+## ⚙️Setup
 ```bash
 git clone https://github.com/work-submit/3MTI.git
 cd 3MTI
