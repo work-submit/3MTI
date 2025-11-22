@@ -48,7 +48,7 @@ Extract semantic information from the reference RGB images:
 #### Step 1: Download the pretrained models
 - Download the pretrained RAM (14M) model weight from [HuggingFace](https://huggingface.co/spaces/xinyu1205/recognize-anything/blob/main/ram_swin_large_14m.pth).
 - Download the DAPE model weight from [GoogleDrive](https://drive.google.com/drive/folders/12HXrRGEXUAnmHRaf0bIn-S8XSK4Ku0JO?usp=drive_link).
-- You can put these models into `/trained_model`.
+- You can put these models into `3MTI/trained_model/`.
 #### Step 2: Modify path
 - Replace lines 16 to 21 of semantic_extract.py with your actual path.
 #### Step 3: Extraction
@@ -67,7 +67,7 @@ XXXXX.png: word1, word2, word3, ...
 ## 🚀Inference
 #### Step 1: Download the pretrained model
 - Download the 3MTI model weight from.
-- You can put these models into `/trained_model`.
+- You can put these models into `3MTI/trained_model/`.
 #### Step 2: Modify path
 - Replace lines 90 and 91 of inference_3MTI.py with your actual semantic prompt text path.
 #### Step 3: Inference and save results
