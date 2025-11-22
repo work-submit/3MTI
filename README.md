@@ -1,6 +1,10 @@
 # 3MTI
 3M-TI: High-Quality Mobile Thermal Imaging via Calibration-free Multi-Camera Cross-Modal Diffusion
 
+## Framework Overview
+
+
+
 ## Setup
 ```bash
 git clone https://github.com/work-submit/3MTI.git
@@ -60,7 +64,7 @@ XXXXX.png: word1, word2, word3, ...
 - Download the 3MTI model weight from.
 - You can put these models into `preset/models`.
 #### Step 2: Modify path
-- Replace lines 90 and 91 of inference_3MTI.py with your actual prompt text path.
+- Replace lines 90 and 91 of inference_3MTI.py with your actual semantic prompt text path.
 #### Step 3: Inference and save results
 ```bash
 python inference_3MTI.py \
@@ -74,7 +78,7 @@ python inference_3MTI.py \
 
 ## 🌈 Train
 #### Step 1: Modify path
-- Replace lines 101 and 104 of train_3MTI.py with your actual prompt text path.
+- Replace lines 101 and 104 of train_3MTI.py with your actual semantic prompt text path.
 #### Step 2: training
 #### Single GPU
 ```bash
