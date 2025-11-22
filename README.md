@@ -27,6 +27,8 @@ Prepare your training set and test set in the following JSON format:
     }
 }
 ```
+
+```
 cd dataset
 python create_json.py
 ```
