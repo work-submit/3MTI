@@ -9,8 +9,8 @@ cd 3MTI
 pip install -r requirements.txt
 ```
 
-## Dataset preparation
-Prepare your training set and test set in the following JSON format
+## Dataset Preparation
+Prepare your training set and test set in the following JSON format:
 ```json
 {
     "train": {
@@ -27,3 +27,12 @@ Prepare your training set and test set in the following JSON format
     }
 }
 ```
+cd dataset
+python create_json.py
+```
+
+## Semantic Extraction
+Extract semantic information from the reference RGB images:
+
+
+
