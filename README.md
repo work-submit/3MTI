@@ -4,6 +4,12 @@
 ## Framework Overview
 ![3MTI](fig/fig_3m-ti.png)
 
+## Qualitative Results on Synthetic Dataset
+![3MTI](fig/sota.png)
+
+## Qualitative Results on Mobile Imaging System
+![3MTI](fig/val.png)
+
 ## Setup
 ```bash
 git clone https://github.com/work-submit/3MTI.git
