@@ -6,6 +6,8 @@
 ```bash
 git clone https://github.com/work-submit/3MTI.git
 cd 3MTI
+conda create -n 3MTI python=3.10 pytorch=2.7.1 pytorch-cuda=11.8 -c pytorch -c nvidia
+conda activate 3MTI
 pip install -r requirements.txt
 ```
 
@@ -35,6 +37,12 @@ python create_json.py
 
 ## Semantic Extraction
 Extract semantic information from the reference RGB images:
-
+#### Step 1: Download the pretrained models
+- Download the pretrained RAM (14M) model weight from [HuggingFace](https://huggingface.co/spaces/xinyu1205/recognize-anything/blob/main/ram_swin_large_14m.pth).
+- Download the DAPE model weight from [GoogleDrive](https://drive.google.com/drive/folders/12HXrRGEXUAnmHRaf0bIn-S8XSK4Ku0JO?usp=drive_link).
+```
+cd src
+python create_json.py
+```
 
 
