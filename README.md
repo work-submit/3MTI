@@ -37,7 +37,7 @@ Prepare your training set and test set in the following JSON format:
     }
 }
 ```
-#### Step 1:
+#### Step 1: Create a JSON file containing the dataset path.
 ```
 cd dataset
 python create_json.py
