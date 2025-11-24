@@ -52,11 +52,8 @@ Extract semantic information from the reference RGB images:
 #### Step 2: Modify path
 - Replace lines 16 to 21 of semantic_extract.py with your actual path.
 ```
-# Image input
 IMAGE_DIR = 'path_to_your_reference_image_folder'
-# Prompt text output
 OUTPUT_FILE_PATH = 'output_path_to/prompt.txt'
-
 PRETRAINED_MODEL_PATH = 'path_to/ram_swin_large_14m.pth'
 DAPE_CKPT_PATH = 'path_to/DAPE.pth'
 ```
@@ -79,6 +76,10 @@ XXXXX.png: word1, word2, word3, ...
 - You can put these models into `3MTI/trained_model/`.
 #### Step 2: Modify path
 - Replace lines 90 and 91 of inference_3MTI.py with your actual semantic prompt text path.
+```
+if os.path.exists("./prompt.txt"):
+    with open("prompt.txt", "r") as f:
+```
 #### Step 3: Inference and save results
 ```bash
 python inference_3MTI.py \
@@ -93,6 +94,10 @@ python inference_3MTI.py \
 ## 🌈 Train
 #### Step 1: Modify path
 - Replace lines 101 and 104 of train_3MTI.py with your actual semantic prompt text path.
+```
+dataset_train = PairedDataset(dataset_path=args.dataset_path, split="train", tokenizer=net_difix.tokenizer, prompts_file="path_to/training_prompt.txt")
+dataset_val = PairedDataset(dataset_path=args.dataset_path, split="test", tokenizer=net_difix.tokenizer, prompts_file="path_to/test_prompt.txt")
+```
 #### Step 2: training
 #### Single GPU
 ```bash
