@@ -1,7 +1,6 @@
-# 3M-TI
-3M-TI: High-Quality Mobile Thermal Imaging via Calibration-free Multi-Camera Cross-Modal Diffusion
+# 3M-TI: High-Quality Mobile Thermal Imaging via Calibration-free Multi-Camera Cross-Modal Diffusion
 
-[Minchong Chen](https://scholar.google.com.hk/citations?hl=zh-CN&user=UX2ZtJcAAAAJ) | [XiaoYun Yuan](https://scholar.google.com/citations?user=MrEV0uwAAAAJ&hl=en) | [Junzhe Wang] | [Jianing Zhang] | [Jun Zhang]
+[Minchong Chen](https://scholar.google.com.hk/citations?hl=zh-CN&user=UX2ZtJcAAAAJ) | [XiaoYun Yuan](https://scholar.google.com/citations?user=MrEV0uwAAAAJ&hl=en) | [Junzhe Wang]() | [Jianing Zhang]() | [Jun Zhang]()
 
 ## 📱Mobile Thermal Imaging System
 ![3MTI](fig/fig_abs.png)
