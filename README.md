@@ -66,7 +66,7 @@ XXXXX.png: word1, word2, word3, ...
 
 ## 🚀Inference
 #### Step 1: Download the pretrained model
-- Download the 3MTI model weight from.
+- Download the 3MTI model weight from [SJTU cloud](https://drive.google.com/drive/folders/12HXrRGEXUAnmHRaf0bIn-S8XSK4Ku0JO?usp=drive_link).
 - You can put these models into `3MTI/trained_model/`.
 #### Step 2: Modify path
 - Replace lines 90 and 91 of inference_3MTI.py with your actual semantic prompt text path.
@@ -113,3 +113,5 @@ accelerate launch --mixed_precision=bf16 --main_process_port 29501 --multi_gpu -
     --lambda_lpips 1.0 --lambda_l2 1.0 --lambda_gram 1.0 --gram_loss_warmup_steps 2000 \
     --tracker_project_name "difix" --tracker_run_name "train" --timestep 199 --mv_unet
 ```
+## 🎒 Data open source
+Our datasets used for training and validation are available at [SJTU cloud](https://drive.google.com/drive/folders/12HXrRGEXUAnmHRaf0bIn-S8XSK4Ku0JO?usp=drive_link).
