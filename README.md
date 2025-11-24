@@ -51,6 +51,15 @@ Extract semantic information from the reference RGB images:
 - You can put these models into `3MTI/trained_model/`.
 #### Step 2: Modify path
 - Replace lines 16 to 21 of semantic_extract.py with your actual path.
+```
+# Image input
+IMAGE_DIR = 'path_to_your_reference_image_folder'
+# Prompt text output
+OUTPUT_FILE_PATH = 'output_path_to/prompt.txt'
+
+PRETRAINED_MODEL_PATH = 'path_to/ram_swin_large_14m.pth'
+DAPE_CKPT_PATH = 'path_to/DAPE.pth'
+```
 #### Step 3: Extraction
 ```
 cd src
