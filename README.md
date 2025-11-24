@@ -1,7 +1,7 @@
 # 3M-TI
 3M-TI: High-Quality Mobile Thermal Imaging via Calibration-free Multi-Camera Cross-Modal Diffusion
 
-
+## 📱Mobile Thermal Imaging System
 ![3MTI](fig/fig_abs.png)
 
 ## 🔎Framework Overview
