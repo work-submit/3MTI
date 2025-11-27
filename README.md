@@ -78,7 +78,7 @@ XXXXX.png: word1, word2, word3, ...
 
 ## 🚀Inference
 #### Step 1: Download the pretrained model
-- Download the pretrained 3MTI model from [pretrained weights and data](https://pan.sjtu.edu.cn/web/share/7df7f0df32ac4cd4eecc243f5ff95483).
+- Download the pretrained 3MTI model from [pretrained weights and data](https://pan.sjtu.edu.cn/web/share/7df7f0df32ac4cd4eecc243f5ff95483) or [HuggingFace](https://huggingface.co/MinchongChen1002/3M-TI/tree/main).
 - You can put this model into `3MTI/trained_model/`.
 #### Step 2: Modify path
 - Replace lines 90 and 91 of inference_3MTI.py with your actual semantic prompt text path.
