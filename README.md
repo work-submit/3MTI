@@ -134,4 +134,4 @@ accelerate launch --mixed_precision=bf16 --main_process_port 29501 --multi_gpu -
     --tracker_project_name "difix" --tracker_run_name "train" --timestep 199 --mv_unet
 ```
 ## 🎒 Data open source
-Our datasets used for training and validation are available at [pretrained weights and data](https://pan.sjtu.edu.cn/web/share/7df7f0df32ac4cd4eecc243f5ff95483).
+Our datasets used for training and validation are available at [pretrained weights and data](https://pan.sjtu.edu.cn/web/share/7df7f0df32ac4cd4eecc243f5ff95483) or [HuggingFace](https://huggingface.co/datasets/MinchongChen1002/3MTI_Datasets/tree/main).
