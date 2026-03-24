@@ -24,7 +24,7 @@ Authors: [Minchong Chen](https://scholar.google.com.hk/citations?hl=zh-CN&user=U
 ```bash
 git clone https://github.com/work-submit/3MTI.git
 cd 3MTI
-conda create -n 3MTI python=3.10 pytorch=2.7.1 pytorch-cuda=11.8 -c pytorch -c nvidia
+conda create -n 3MTI python=3.10 -y
 conda activate 3MTI
 pip install -r requirements.txt
 ```
