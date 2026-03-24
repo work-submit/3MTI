@@ -3,11 +3,11 @@ torchvision==0.22.1+cu118
 torchaudio==2.7.1
 xformers==0.0.31
 diffusers==0.25.1
-transformers==4.37.2
-accelerate==1.1.0
+transformers==4.48.3
+accelerate==1.13.0
 peft==0.9.0
 bitsandbytes==0.46.1
-datasets==4.0.0
+datasets==4.1.1
 numpy==2.1.2
 opencv-python==4.12.0.88
 imageio==2.37.0
@@ -21,3 +21,4 @@ safetensors==0.5.3
 fairscale==0.4.13
 wandb==0.21.0 
 tensorboard==2.20.0
+huggingface_hub==0.24.6
