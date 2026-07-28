@@ -151,5 +151,10 @@ Authors: [Minchong Chen](https://scholar.google.com.hk/citations?hl=zh-CN&user=U
 
 ## 📷Qualitative Results on Mobile Imaging System
 <p align="center">
-<img src="fig/Fusion_val.png" width="500" alt="Fusion validation results">
+<img src="fig/Fusion_val.png" width="600" alt="Fusion validation results">
+</p>
+
+## 📌Downstream Pedestrian Detection
+<p align="center">
+<img src="fig/Detection.png" width="600" alt="Pedestrian detection results">
 </p>
