@@ -145,3 +145,9 @@ Our datasets used for training and validation are available at [pretrained weigh
 BeyondFusion: [arXiv](https://arxiv.org/abs/2607.24110) | [Project Page](https://xiaoyunyuan.net/index.html?project=beyondfusion)
 
 Authors: [Minchong Chen](https://scholar.google.com.hk/citations?hl=zh-CN&user=UX2ZtJcAAAAJ) | [Xiaoyun Yuan](https://xiaoyunyuan.net/) | [Minyu Cao]() | [Jianing Zhang]() | [Jun Zhang]() | [Shuyang Liu]() | [Xiaokang Yang](https://icne.sjtu.edu.cn/info/1064/1078.htm)
+
+## 🔎Framework Overview
+![BeyondFusion](fig/BeyondFusion_framework.png)
+
+## 📷Qualitative Results on Mobile Imaging System
+![BeyondFusion](fig/Fusion_val.png)
