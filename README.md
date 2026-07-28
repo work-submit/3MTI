@@ -151,5 +151,5 @@ Authors: [Minchong Chen](https://scholar.google.com.hk/citations?hl=zh-CN&user=U
 
 ## 📷Qualitative Results on Mobile Imaging System
 <p align="center">
-<img src="fig/Fusion_val.png" width="800" alt="Fusion validation results">
+<img src="fig/Fusion_val.png" width="500" alt="Fusion validation results">
 </p>
