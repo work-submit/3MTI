@@ -1,4 +1,5 @@
 # (CVPR 2026) 3M-TI: High-Quality Mobile Thermal Imaging via Calibration-free Multi-Camera Cross-Modal Diffusion
+# (ArXiv) BeyondFusion: Self-Aligned Latent Diffusion for Calibration-Free Infrared Super-Resolution and Infrared-Visible Fusion
 
 Papers: [Arxiv](https://arxiv.org/abs/2511.19117) | [Project Page](https://lab.xiaoyunyuan.net/index.html?project=3m-ti)
 
