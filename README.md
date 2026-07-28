@@ -1,13 +1,15 @@
 # (CVPR 2026) 3M-TI: High-Quality Mobile Thermal Imaging via Calibration-free Multi-Camera Cross-Modal Diffusion
 # (ArXiv) BeyondFusion: Self-Aligned Latent Diffusion for Calibration-Free Infrared Super-Resolution and Infrared-Visible Fusion
 
-Papers: [3M-TI](https://arxiv.org/abs/2511.19117) | [BeyondFusion](https://arxiv.org/abs/2607.24110) | Project Page: [3M-TI](https://lab.xiaoyunyuan.net/index.html?project=3m-ti) | [BeyondFusion](https://xiaoyunyuan.net/index.html?project=beyondfusion)
-
+3M-TI: [Papers](https://arxiv.org/abs/2511.19117) | [Project Page](https://lab.xiaoyunyuan.net/index.html?project=3m-ti)
 Authors: [Minchong Chen](https://scholar.google.com.hk/citations?hl=zh-CN&user=UX2ZtJcAAAAJ) | [Xiaoyun Yuan](https://xiaoyunyuan.net/) | [Junzhe Wan](https://scholar.google.com.hk/citations?view_op=list_works&hl=zh-CN&hl=zh-CN&user=QbbWdzEAAAAJ) | [Jianing Zhang]() | [Jun Zhang]()
+
+BeyondFusion: [Papers](https://arxiv.org/abs/2607.24110) | [Project Page](https://xiaoyunyuan.net/index.html?project=beyondfusion)
+Authors: [Minchong Chen](https://scholar.google.com.hk/citations?hl=zh-CN&user=UX2ZtJcAAAAJ) | [Xiaoyun Yuan](https://xiaoyunyuan.net/) | [Minyu Cao]() | [Jianing Zhang]() | [Jun Zhang]() | [Shuyang Liu]() | [Xiaokang Yang](https://icne.sjtu.edu.cn/info/1064/1078.htm)
 
 ## :rocket: Updates 
 
-[2026-2-21] Our paper has been accepted by CVPR 2026. The code and dataset have been officially released.🎉🎉🎉
+[2026-2-21] Our paper 3M-TI has been accepted by CVPR 2026. The code and dataset have been officially released.🎉🎉🎉
 
 ## 📱Mobile Thermal Imaging System
 ![3MTI](fig/fig_abs.png)
