@@ -163,6 +163,8 @@ Our datasets used for training and validation are available at [pretrained weigh
 
 ## 🚀Inference
 
+📚 The CFG scale is adjustable, where CFG_scale=1.1 is recommended in this work.
+
 ## Joint infrared SR and IVF
 ```bash
 cd 3MTI-extension
@@ -170,6 +172,7 @@ cd src
 cd joint_train_inference
 ```
 
+## Run Inference
 ```bash
 python inference_BeyFusion.py \
 --model_path "Path to pretrained model weight (BeyFusion_joint_SR_IVF.pkl) or your trained model weight" \
@@ -190,6 +193,7 @@ cd src
 cd separate_infrared_SR
 ```
 
+## Run Inference
 ```bash
 python inference_BeyFusion.py \
 --model_path "Path to pretrained model weight (BeyFusion_infrared_SR.pkl) or your trained model weight" \
@@ -209,6 +213,7 @@ cd src
 cd separate_IVF
 ```
 
+## Run Inference
 ```bash
 python inference_BeyFusion.py \
 --model_path "Path to pretrained model weight (BeyFusion_IVF.pkl) or your trained model weight" \
@@ -252,6 +257,7 @@ Fill the joint_dataset.json in the data file:
 }
 ```
 
+## Run Training
 ```
 accelerate launch --mixed_precision=bf16 train_BeyFusion.py \
     --output_dir="Model weights save path" \
@@ -299,6 +305,7 @@ Fill the Infrared_SR_dataset.json in the data file:
 }
 ```
 
+## Run Training
 ```
 accelerate launch --mixed_precision=bf16 train_BeyFusion.py \
     --output_dir="Model weights save path" \
@@ -341,6 +348,7 @@ Fill the IVF_dataset.json in the data file:
 }
 ```
 
+## Run Training
 ```
 accelerate launch --mixed_precision=bf16 train_BeyFusion.py \
     --output_dir="Model weights save path" \
