@@ -159,9 +159,64 @@ Authors: [Minchong Chen](https://scholar.google.com.hk/citations?hl=zh-CN&user=U
 <img src="fig/Detection.png" width="600" alt="Pedestrian detection results">
 </p>
 
+Our datasets used for training and validation are available at [pretrained weights and data](https://pan.sjtu.edu.cn/web/share/365c881396aeeafd63269b1ca4ca1f6f)
+
 ## 🚀Inference
 
 #### Joint infrared SR and IVF
 ```bash
 cd 3MTI-extension
+cd src
+cd joint_train_inference
+```
+
+```bash
+python inference_BeyFusion.py \
+--model_path "Path to pretrained model weight (BeyFusion_joint_SR_IVF.pkl) or your trained model weight" \
+--input_image "Path to input high-resolution visible image" \
+--ref_image "Path to degraded, calibration-free infrared image" \
+--prompt "visible-infrared image fusion and infrared image super-resolution" \
+--prompt_neg "The original visible image and low-resolution infrared image" \
+--output_dir "Inference outputs save path" \
+--cfg_scales_fu 1.1 \
+--cfg_scales_sr 1.1 \
+--mv_unet
+```
+
+#### Infrared SR
+```bash
+cd 3MTI-extension
+cd src
+cd separate_infrared_SR
+```
+
+```bash
+python inference_BeyFusion.py \
+--model_path "Path to pretrained model weight (BeyFusion_infrared_SR.pkl) or your trained model weight" \
+--input_image "Path to input low-resolution infrared image" \
+--ref_image "Path to calibration-free high-resolution visible image" \
+--prompt "high-quality super-resolved infrared image" \
+--prompt_neg "original degraded low-resolution infrared image" \
+--output_dir "Inference outputs save path" \
+--cfg_scales 1.1 \
+--mv_unet
+```
+
+#### IVF
+```bash
+cd 3MTI-extension
+cd src
+cd separate_IVF
+```
+
+```bash
+python inference_BeyFusion.py \
+--model_path "Path to pretrained model weight (BeyFusion_IVF.pkl) or your trained model weight" \
+--input_image "Path to input high-resolution visible image" \
+--ref_image "Path to degraded, calibration-free infrared image" \
+--prompt "a high-quality fused image, salient objects clearly highlighted, clear structure and rich details, complementary information from visible and thermal modalities" \
+--prompt_neg "an RGB-only image lacking infrared information, neglecting thermal cues, single-modality visible image" \
+--output_dir "Inference outputs save path" \
+--cfg_scales 1.1 \
+--mv_unet
 ```
