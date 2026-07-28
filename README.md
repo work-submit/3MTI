@@ -159,7 +159,7 @@ Authors: [Minchong Chen](https://scholar.google.com.hk/citations?hl=zh-CN&user=U
 <img src="fig/Detection.png" width="600" alt="Pedestrian detection results">
 </p>
 
-Our datasets used for training and validation are available at [pretrained weights and data](https://pan.sjtu.edu.cn/web/share/365c881396aeeafd63269b1ca4ca1f6f)
+Our datasets used for training and validation are available at [pretrained weights and data](https://pan.sjtu.edu.cn/web/share/365c881396aeeafd63269b1ca4ca1f6f).
 
 ## 🚀Inference
 
