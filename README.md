@@ -220,3 +220,53 @@ python inference_BeyFusion.py \
 --cfg_scales 1.1 \
 --mv_unet
 ```
+
+## 🌈 Train
+#### Joint infrared SR and IVF
+```bash
+cd 3MTI-extension
+cd src
+cd joint_train_inference
+```
+
+## Dataset Preparation
+Fill the joint_dataset.json in the data file:
+```json
+{
+    "train": {
+        "target_fusion": "Path to target fusion image",
+        "target_SR": "Path to target high-resolution infrared image",
+        "image": "Path to input high-resolution visible image",
+        "ref_image": "Path to degraded, calibration-free infrared image",
+        "prompt": "visible-infrared image fusion and infrared image super-resolution",
+        "prompt_neg": "The original visible image and low-resolution infrared image"
+    },
+    "test": {
+        "target_fusion": "Path to target fusion image",
+        "target_SR": "Path to target high-resolution infrared image",
+        "image": "Path to input high-resolution visible image",
+        "ref_image": "Path to degraded, calibration-free infrared image",
+        "prompt": "visible-infrared image fusion and infrared image super-resolution",
+        "prompt_neg": "The original visible image and low-resolution infrared image"
+    }
+}
+```
+
+```
+accelerate launch --mixed_precision=bf16 train_BeyFusion.py \
+    --output_dir="Model weights save path" \
+    --dataset_path="./data/joint_dataset.json" \
+    --max_train_steps 16000 \
+    --resolution=512 --learning_rate 2e-5 \
+    --train_batch_size=4 --dataloader_num_workers 0 \
+    --enable_xformers_memory_efficient_attention \
+    --checkpointing_steps=2000 --eval_freq 2000 --viz_freq 10000 \
+    --lambda_int_pos 1.0 \
+    --lambda_int_neg 0.0 \
+    --lambda_color_pos 1.0 \
+    --lambda_color_neg 0.0 \
+    --lambda_l2 2.0 \
+    --lambda_l2_sr 10.0 \
+    --lambda_lpips 1.0 \
+    --tracker_project_name "difix" --tracker_run_name "train" --timestep 199 --mv_unet
+```
