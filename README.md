@@ -165,8 +165,9 @@ Our datasets used for training and validation are available at [pretrained weigh
 
 📚 Note:
 
-1. The proposed framework supports both task-specific and joint training and inference. 
-2. During the inference, the CFG scale is adjustable, where CFG_scale=1.1 is recommended in this work.
+1. The proposed framework BeyondFusion supports both task-specific and joint training and inference. 
+2. For the joint inference, our model simultaneously outputs infrared-visible image fusion (IVF) and infrared super-resolution (SR) results.
+3. During the inference, the CFG scale is adjustable, where CFG_scale=1.1 is recommended in this work.
 
 ## Mode 1: Joint infrared SR and IVF
 ```bash
