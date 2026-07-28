@@ -150,4 +150,6 @@ Authors: [Minchong Chen](https://scholar.google.com.hk/citations?hl=zh-CN&user=U
 ![BeyondFusion](fig/BeyondFusion_framework.png)
 
 ## 📷Qualitative Results on Mobile Imaging System
-![BeyondFusion](fig/Fusion_val.png)
+<p align="center">
+<img src="fig/Fusion_val.png" width="800" alt="Fusion validation results">
+</p>
