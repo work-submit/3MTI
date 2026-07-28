@@ -2,9 +2,11 @@
 # (ArXiv) BeyondFusion: Self-Aligned Latent Diffusion for Calibration-Free Infrared Super-Resolution and Infrared-Visible Fusion
 
 3M-TI: [Papers](https://arxiv.org/abs/2511.19117) | [Project Page](https://lab.xiaoyunyuan.net/index.html?project=3m-ti)
+
 Authors: [Minchong Chen](https://scholar.google.com.hk/citations?hl=zh-CN&user=UX2ZtJcAAAAJ) | [Xiaoyun Yuan](https://xiaoyunyuan.net/) | [Junzhe Wan](https://scholar.google.com.hk/citations?view_op=list_works&hl=zh-CN&hl=zh-CN&user=QbbWdzEAAAAJ) | [Jianing Zhang]() | [Jun Zhang]()
 
 BeyondFusion: [Papers](https://arxiv.org/abs/2607.24110) | [Project Page](https://xiaoyunyuan.net/index.html?project=beyondfusion)
+
 Authors: [Minchong Chen](https://scholar.google.com.hk/citations?hl=zh-CN&user=UX2ZtJcAAAAJ) | [Xiaoyun Yuan](https://xiaoyunyuan.net/) | [Minyu Cao]() | [Jianing Zhang]() | [Jun Zhang]() | [Shuyang Liu]() | [Xiaokang Yang](https://icne.sjtu.edu.cn/info/1064/1078.htm)
 
 ## :rocket: Updates 
