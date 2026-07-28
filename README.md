@@ -172,7 +172,7 @@ Our datasets used for training and validation are available at [pretrained weigh
 ## Semantic Extraction (optional)
 Extract semantic information from the high-resolution input/reference visible images (following the steps given above).
 
-## Mode 1: Joint infrared SR and IVF
+## Mode 1: Joint Infrared SR and IVF
 ```bash
 cd 3MTI-extension
 cd src
@@ -234,7 +234,7 @@ python inference_BeyFusion.py \
 ```
 
 ## 🌈 Train
-## Mode 1: Joint infrared SR and IVF
+## Mode 1: Joint Infrared SR and IVF
 ```bash
 cd 3MTI-extension
 cd src
