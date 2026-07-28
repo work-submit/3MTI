@@ -163,9 +163,12 @@ Our datasets used for training and validation are available at [pretrained weigh
 
 ## 🚀Inference
 
-📚 The CFG scale is adjustable, where CFG_scale=1.1 is recommended in this work.
+📚 Note:
 
-## Joint infrared SR and IVF
+1. The proposed framework supports both task-specific and joint training and inference. 
+2. During the inference, the CFG scale is adjustable, where CFG_scale=1.1 is recommended in this work.
+
+## Mode 1: Joint infrared SR and IVF
 ```bash
 cd 3MTI-extension
 cd src
@@ -186,7 +189,7 @@ python inference_BeyFusion.py \
 --mv_unet
 ```
 
-## Infrared SR
+## Mode 2: Single Infrared SR
 ```bash
 cd 3MTI-extension
 cd src
@@ -206,7 +209,7 @@ python inference_BeyFusion.py \
 --mv_unet
 ```
 
-## IVF
+## Mode 3: Single IVF
 ```bash
 cd 3MTI-extension
 cd src
@@ -227,7 +230,7 @@ python inference_BeyFusion.py \
 ```
 
 ## 🌈 Train
-## Joint infrared SR and IVF
+## Mode 1: Joint infrared SR and IVF
 ```bash
 cd 3MTI-extension
 cd src
@@ -277,7 +280,7 @@ accelerate launch --mixed_precision=bf16 train_BeyFusion.py \
     --tracker_project_name "difix" --tracker_run_name "train" --timestep 199 --mv_unet
 ```
 
-## Infrared SR
+## Mode 2: Single Infrared SR
 ```bash
 cd 3MTI-extension
 cd src
@@ -320,7 +323,7 @@ accelerate launch --mixed_precision=bf16 train_BeyFusion.py \
     --tracker_project_name "difix" --tracker_run_name "train" --timestep 199 --mv_unet
 ```
 
-## IVF
+## Mode 3: Single IVF
 ```bash
 cd 3MTI-extension
 cd src
