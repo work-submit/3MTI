@@ -163,7 +163,7 @@ Our datasets used for training and validation are available at [pretrained weigh
 
 ## 🚀Inference
 
-#### Joint infrared SR and IVF
+## Joint infrared SR and IVF
 ```bash
 cd 3MTI-extension
 cd src
@@ -183,7 +183,7 @@ python inference_BeyFusion.py \
 --mv_unet
 ```
 
-#### Infrared SR
+## Infrared SR
 ```bash
 cd 3MTI-extension
 cd src
@@ -202,7 +202,7 @@ python inference_BeyFusion.py \
 --mv_unet
 ```
 
-#### IVF
+## IVF
 ```bash
 cd 3MTI-extension
 cd src
@@ -222,7 +222,7 @@ python inference_BeyFusion.py \
 ```
 
 ## 🌈 Train
-#### Joint infrared SR and IVF
+## Joint infrared SR and IVF
 ```bash
 cd 3MTI-extension
 cd src
@@ -267,6 +267,48 @@ accelerate launch --mixed_precision=bf16 train_BeyFusion.py \
     --lambda_color_neg 0.0 \
     --lambda_l2 2.0 \
     --lambda_l2_sr 10.0 \
+    --lambda_lpips 1.0 \
+    --tracker_project_name "difix" --tracker_run_name "train" --timestep 199 --mv_unet
+```
+
+## Infrared SR
+```bash
+cd 3MTI-extension
+cd src
+cd separate_infrared_SR
+```
+
+## Dataset Preparation
+Fill the Infrared_SR_dataset.json in the data file:
+```json
+{
+    "train": {
+        "target_image": "Path to target high-resolution infrared image",
+        "image": "Path to input low-resolution infrared image",
+        "ref_image": "Path to calibration-free high-resolution visible image",
+        "prompt": "high-quality super-resolved infrared image",
+        "prompt_neg": "original degraded low-resolution infrared image"
+    },
+    "test": {
+        "target_image": "Path to target high-resolution infrared image",
+        "image": "Path to input low-resolution infrared image",
+        "ref_image": "Path to calibration-free high-resolution visible image",
+        "prompt": "high-quality super-resolved infrared image",
+        "prompt_neg": "original degraded low-resolution infrared image"
+    }
+}
+```
+
+```
+accelerate launch --mixed_precision=bf16 train_BeyFusion.py \
+    --output_dir="Model weights save path" \
+    --dataset_path="./data/Infrared_SR_dataset.json" \
+    --max_train_steps 12000 \
+    --resolution=512 --learning_rate 2e-5 \
+    --train_batch_size=4 --dataloader_num_workers 0 \
+    --enable_xformers_memory_efficient_attention \
+    --checkpointing_steps=2000 --eval_freq 2000 --viz_freq 10000 \
+    --lambda_l2 10.0 \
     --lambda_lpips 1.0 \
     --tracker_project_name "difix" --tracker_run_name "train" --timestep 199 --mv_unet
 ```
