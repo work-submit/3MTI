@@ -312,3 +312,49 @@ accelerate launch --mixed_precision=bf16 train_BeyFusion.py \
     --lambda_lpips 1.0 \
     --tracker_project_name "difix" --tracker_run_name "train" --timestep 199 --mv_unet
 ```
+
+## IVF
+```bash
+cd 3MTI-extension
+cd src
+cd separate_IVF
+```
+
+## Dataset Preparation
+Fill the IVF_dataset.json in the data file:
+```json
+{
+    "train": {
+        "target_image": "Path to target fusion image",
+        "image": "Path to input high-resolution visible image",
+        "ref_image": "Path to degraded, calibration-free infrared image",
+        "prompt": "a high-quality fused image, salient objects clearly highlighted, clear structure and rich details, complementary information from visible and thermal modalities",
+        "prompt_neg": "an RGB-only image lacking infrared information, neglecting thermal cues, single-modality visible image"
+    },
+    "test": {
+        "target_image": "Path to target fusion image",
+        "image": "Path to input high-resolution visible image",
+        "ref_image": "Path to degraded, calibration-free infrared image",
+        "prompt": "a high-quality fused image, salient objects clearly highlighted, clear structure and rich details, complementary information from visible and thermal modalities",
+        "prompt_neg": "an RGB-only image lacking infrared information, neglecting thermal cues, single-modality visible image"
+    }
+}
+```
+
+```
+accelerate launch --mixed_precision=bf16 train_BeyFusion.py \
+    --output_dir="Model weights save path" \
+    --dataset_path="./data/IVF_dataset.json" \
+    --max_train_steps 16000 \
+    --resolution=512 --learning_rate 2e-5 \
+    --train_batch_size=4 --dataloader_num_workers 0 \
+    --enable_xformers_memory_efficient_attention \
+    --checkpointing_steps=2000 --eval_freq 2000 --viz_freq 10000 \
+    --lambda_int_pos 1.0 \
+    --lambda_int_neg 0.0 \
+    --lambda_color_pos 1.0 \
+    --lambda_color_neg 0.0 \
+    --lambda_l2 2.0 \
+    --lambda_lpips 1.0 \
+    --tracker_project_name "difix" --tracker_run_name "train" --timestep 199 --mv_unet
+```
