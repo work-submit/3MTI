@@ -158,3 +158,10 @@ Authors: [Minchong Chen](https://scholar.google.com.hk/citations?hl=zh-CN&user=U
 <p align="center">
 <img src="fig/Detection.png" width="600" alt="Pedestrian detection results">
 </p>
+
+## 🚀Inference
+
+#### Joint infrared SR and IVF
+```bash
+cd 3MTI-extension
+```
