@@ -1,0 +1,16 @@
+{
+    "train": {
+        "target_image": "Path to target high-resolution infrared image",
+        "image": "Path to input low-resolution infrared image",
+        "ref_image": "Path to calibration-free high-resolution visible image",
+        "prompt": "high-quality super-resolved infrared image",
+        "prompt_neg": "original degraded low-resolution infrared image"
+    },
+    "test": {
+        "target_image": "Path to target high-resolution infrared image",
+        "image": "Path to input low-resolution infrared image",
+        "ref_image": "Path to calibration-free high-resolution visible image",
+        "prompt": "high-quality super-resolved infrared image",
+        "prompt_neg": "original degraded low-resolution infrared image"
+    }
+}

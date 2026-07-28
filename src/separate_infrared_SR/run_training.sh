@@ -1,0 +1,11 @@
+accelerate launch --mixed_precision=bf16 train_BeyFusion.py \
+    --output_dir="Model weights save path" \
+    --dataset_path="./data/Infrared_SR_dataset.json" \
+    --max_train_steps 12000 \
+    --resolution=512 --learning_rate 2e-5 \
+    --train_batch_size=4 --dataloader_num_workers 0 \
+    --enable_xformers_memory_efficient_attention \
+    --checkpointing_steps=2000 --eval_freq 2000 --viz_freq 10000 \
+    --lambda_l2 10.0 \
+    --lambda_lpips 1.0 \
+    --tracker_project_name "difix" --tracker_run_name "train" --timestep 199 --mv_unet

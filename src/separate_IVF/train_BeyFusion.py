@@ -1,0 +1,433 @@
+import os
+import gc
+import lpips
+import random
+import argparse
+import numpy as np
+import torch
+import torch.nn.functional as F
+import torch.utils.checkpoint
+import torchvision
+import transformers
+from torchvision.transforms.functional import crop
+from accelerate import Accelerator
+from accelerate.utils import set_seed
+from PIL import Image
+from torchvision import transforms
+from tqdm.auto import tqdm
+from glob import glob
+from einops import rearrange
+
+import diffusers
+from diffusers.utils.import_utils import is_xformers_available
+from diffusers.optimization import get_scheduler
+
+import wandb
+
+from model import Difix, load_ckpt_from_state_dict, save_ckpt
+from dataset import PairedDataset
+from loss import (
+    intensity_loss,
+    color_loss,
+)
+
+def main(args):
+    accelerator = Accelerator(
+        gradient_accumulation_steps=args.gradient_accumulation_steps,
+        mixed_precision=args.mixed_precision,
+        log_with=args.report_to,
+    )
+
+    if accelerator.is_local_main_process:
+        transformers.utils.logging.set_verbosity_warning()
+        diffusers.utils.logging.set_verbosity_info()
+    else:
+        transformers.utils.logging.set_verbosity_error()
+        diffusers.utils.logging.set_verbosity_error()
+
+    if args.seed is not None:
+        set_seed(args.seed)
+
+    if accelerator.is_main_process:
+        os.makedirs(os.path.join(args.output_dir, "checkpoints"), exist_ok=True)
+        os.makedirs(os.path.join(args.output_dir, "eval"), exist_ok=True)
+
+    net_difix = Difix(
+        lora_rank_vae=args.lora_rank_vae, 
+        timestep=args.timestep,
+        mv_unet=args.mv_unet,
+    )
+    net_difix.set_train()
+
+    if args.enable_xformers_memory_efficient_attention:
+        if is_xformers_available():
+            net_difix.unet.enable_xformers_memory_efficient_attention()
+        else:
+            raise ValueError("xformers is not available, please install it by running `pip install xformers`")
+
+    if args.gradient_checkpointing:
+        net_difix.unet.enable_gradient_checkpointing()
+
+    if args.allow_tf32:
+        torch.backends.cuda.matmul.allow_tf32 = True
+
+    net_lpips = lpips.LPIPS(net='vgg').cuda()
+
+    net_lpips.requires_grad_(False)
+    
+    net_vgg = torchvision.models.vgg16(pretrained=True).features
+    for param in net_vgg.parameters():
+        param.requires_grad_(False)
+
+    # make the optimizer
+    layers_to_opt = []
+    layers_to_opt += list(net_difix.unet.parameters())
+   
+    for n, _p in net_difix.vae.named_parameters():
+        if "lora" in n and "vae_skip" in n:
+            assert _p.requires_grad
+            layers_to_opt.append(_p)
+    layers_to_opt = layers_to_opt + list(net_difix.vae.decoder.skip_conv_1.parameters()) + \
+        list(net_difix.vae.decoder.skip_conv_2.parameters()) + \
+        list(net_difix.vae.decoder.skip_conv_3.parameters()) + \
+        list(net_difix.vae.decoder.skip_conv_4.parameters())
+
+    optimizer = torch.optim.AdamW(layers_to_opt, lr=args.learning_rate,
+        betas=(args.adam_beta1, args.adam_beta2), weight_decay=args.adam_weight_decay,
+        eps=args.adam_epsilon,)
+    lr_scheduler = get_scheduler(args.lr_scheduler, optimizer=optimizer,
+        num_warmup_steps=args.lr_warmup_steps * accelerator.num_processes,
+        num_training_steps=args.max_train_steps * accelerator.num_processes,
+        num_cycles=args.lr_num_cycles, power=args.lr_power,)    
+
+    dataset_train = PairedDataset(dataset_path=args.dataset_path, split="train", tokenizer=net_difix.tokenizer, prompts_file="./Fusion_train_prompt.txt")  # add prompt file
+    dl_train = torch.utils.data.DataLoader(dataset_train, batch_size=args.train_batch_size, shuffle=True, num_workers=args.dataloader_num_workers)
+
+    dataset_val = PairedDataset(dataset_path=args.dataset_path, split="test", tokenizer=net_difix.tokenizer, prompts_file="./Fusion_test_prompt.txt")     # add prompt file
+    #random.Random(42).shuffle(dataset_val.img_ids)
+    dl_val = torch.utils.data.DataLoader(dataset_val, batch_size=1, shuffle=False, num_workers=0)
+
+    # Resume from checkpoint
+    global_step = 0    
+    if args.resume is not None:
+        if os.path.isdir(args.resume):
+            # Resume from last ckpt
+            ckpt_files = glob(os.path.join(args.resume, "*.pkl"))
+            assert len(ckpt_files) > 0, f"No checkpoint files found: {args.resume}"
+            ckpt_files = sorted(ckpt_files, key=lambda x: int(x.split("/")[-1].replace("model_", "").replace(".pkl", "")))
+            print("="*50); print(f"Loading checkpoint from {ckpt_files[-1]}"); print("="*50)
+            global_step = int(ckpt_files[-1].split("/")[-1].replace("model_", "").replace(".pkl", ""))
+            net_difix, optimizer = load_ckpt_from_state_dict(
+                net_difix, optimizer, ckpt_files[-1]
+            )
+        elif args.resume.endswith(".pkl"):
+            print("="*50); print(f"Loading checkpoint from {args.resume}"); print("="*50)
+            global_step = int(args.resume.split("/")[-1].replace("model_", "").replace(".pkl", ""))
+            net_difix, optimizer = load_ckpt_from_state_dict(
+                net_difix, optimizer, args.resume
+            )    
+        else:
+            raise NotImplementedError(f"Invalid resume path: {args.resume}")
+    else:
+        print("="*50); print(f"Training from scratch"); print("="*50)
+    
+    weight_dtype = torch.float32
+    if accelerator.mixed_precision == "fp16":
+        weight_dtype = torch.float16
+    elif accelerator.mixed_precision == "bf16":
+        weight_dtype = torch.bfloat16
+
+    # Move al networksr to device and cast to weight_dtype
+    net_difix.to(accelerator.device, dtype=weight_dtype)
+    net_lpips.to(accelerator.device, dtype=weight_dtype)
+    net_vgg.to(accelerator.device, dtype=weight_dtype)
+    
+    # Prepare everything with our `accelerator`.
+    net_difix, optimizer, dl_train, lr_scheduler = accelerator.prepare(
+        net_difix, optimizer, dl_train, lr_scheduler
+    )
+    net_lpips, net_vgg = accelerator.prepare(net_lpips, net_vgg)
+    # renorm with image net statistics
+    t_vgg_renorm =  transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+
+    # We need to initialize the trackers we use, and also store our configuration.
+    # The trackers initializes automatically on the main process.
+    if accelerator.is_main_process:
+        init_kwargs = {
+            "wandb": {
+                "name": args.tracker_run_name,
+                "dir": args.output_dir,
+            },
+        }        
+        tracker_config = dict(vars(args))
+        accelerator.init_trackers(args.tracker_project_name, config=tracker_config, init_kwargs=init_kwargs)
+
+    progress_bar = tqdm(range(0, args.max_train_steps), initial=global_step, desc="Steps",
+        disable=not accelerator.is_local_main_process,)
+
+    # start the training loop
+    # output_dir = 'debug2'
+    output_dir = 'debug_IVF'
+    os.makedirs(output_dir,exist_ok=True)
+    while 1:
+        if global_step > args.max_train_steps + 10:
+            break
+        for step, batch in enumerate(dl_train):
+            if global_step > args.max_train_steps + 10:
+                break
+            l_acc = [net_difix]
+            with accelerator.accumulate(*l_acc):
+                # Debug prompt
+                if step < 2:
+                    fnames = batch.get("filename", None)
+                    prompts = batch.get("caption", None)  
+                    print("\n[DEBUG] Training batch prompts:")
+                    for f, p in zip(fnames, prompts):
+                        print(f"  {f} -> {p}")
+
+                x_src = batch["conditioning_pixel_values"]  # [B,2,C,H,W]
+                x_tgt = batch["output_pixel_values"]        # [B,2,C,H,W]
+                is_positive = batch["is_positive"]          # [B]
+
+                B, V, C, H, W = x_src.shape
+
+                # forward
+                x_tgt_pred = net_difix(x_src, prompt_tokens=batch["input_ids"])
+                x_tgt_pred_fused = x_tgt_pred[:, 0, :, :, :]   # [B,C,H,W]
+
+                # inputs
+                rgb = x_src[:, 0, :, :, :]
+                fusion_ref = x_tgt[:, 0, :, :, :]
+
+                # mask → λ映射
+                if isinstance(is_positive, list):
+                    is_positive = torch.tensor(is_positive, device=x_src.device)
+
+                is_positive = is_positive.bool()  # [B]
+
+                # shape: [B,1,1,1] → broadcast
+                mask = is_positive.float().view(-1, 1, 1, 1)
+
+                lambda_int = mask * args.lambda_int_pos + (1 - mask) * args.lambda_int_neg
+                lambda_color = mask * args.lambda_color_pos + (1 - mask) * args.lambda_color_neg
+
+                # loss
+                # intensity loss
+                loss_int_map = intensity_loss(x_tgt_pred_fused, fusion_ref)  # [B] or scalar
+                if loss_int_map.dim() == 0:
+                    loss_int_map = loss_int_map.repeat(B)
+
+                loss_int = (loss_int_map.view(B, 1, 1, 1) * lambda_int).mean()
+
+                # color loss
+                loss_color_map = color_loss(x_tgt_pred_fused, rgb)
+                if loss_color_map.dim() == 0:
+                    loss_color_map = loss_color_map.repeat(B)
+
+                loss_color = (loss_color_map.view(B, 1, 1, 1) * lambda_color).mean()
+
+                # LPIPS
+                loss_lpips_map = net_lpips(x_tgt_pred_fused, fusion_ref)  # [B,1,1,1] or [B]
+                loss_lpips = (loss_lpips_map * args.lambda_lpips).mean()
+
+                # L2
+                loss_l2_map = (x_tgt_pred_fused - fusion_ref) ** 2
+                loss_l2_map = loss_l2_map.mean(dim=[1,2,3], keepdim=True)  # [B,1,1,1]
+                loss_l2 = (loss_l2_map * args.lambda_l2).mean()
+
+                # total loss
+                loss = loss_color + loss_l2 + loss_lpips + loss_int
+
+                # backward
+                accelerator.backward(loss, retain_graph=False)
+
+                if accelerator.sync_gradients:
+                    accelerator.clip_grad_norm_(layers_to_opt, args.max_grad_norm)
+
+                optimizer.step()
+                lr_scheduler.step()
+                optimizer.zero_grad(set_to_none=args.set_grads_to_none)
+
+            # Checks if the accelerator has performed an optimization step behind the scenes
+            if accelerator.sync_gradients:
+                progress_bar.update(1)
+                global_step += 1
+
+                if accelerator.is_main_process:
+                    logs = {}
+                    # log all the losses
+                    logs["loss_int"] = loss_int.detach().item()
+                    logs["loss_l2"] = loss_l2.detach().item()
+                    logs["loss_color"] = loss_color.detach().item()
+                    logs["loss_lpips"] = loss_lpips.detach().item()
+                    progress_bar.set_postfix(**logs)
+
+                    if step % 1000 == 0:
+                        # 处理 source 图像
+                        x_src_vis = rearrange(x_src, "b v c h w -> b c (v h) w")[0].float().detach().cpu()
+                        x_src_vis = x_src_vis * 0.5 + 0.5  # 如果原图在 [-1,1] 范围，归一化到 [0,1]
+                        output_pil_src = transforms.ToPILImage()(x_src_vis)
+                        output_pil_src.save(os.path.join(output_dir, f"source_step{global_step}.png"))
+
+                        # 处理 target 图像
+                        x_tgt_vis = rearrange(x_tgt, "b v c h w -> b c (v h) w")[0].float().detach().cpu()
+                        x_tgt_vis = x_tgt_vis * 0.5 + 0.5
+                        output_pil_tgt = transforms.ToPILImage()(x_tgt_vis)
+                        output_pil_tgt.save(os.path.join(output_dir, f"target_step{global_step}.png"))
+
+                        # 新增：保存融合预测结果
+                        x_tgt_pred_vis = rearrange(x_tgt_pred, "b v c h w -> b c (v h) w")[0].float().detach().cpu()
+                        x_tgt_pred_vis = x_tgt_pred_vis * 0.5 + 0.5
+                        output_pil_pred = transforms.ToPILImage()(x_tgt_pred_vis)
+                        output_pil_pred.save(os.path.join(output_dir, f"pred_step{global_step}.png"))
+
+                    # checkpoint the model
+                    if global_step % args.checkpointing_steps == 1:
+                        outf = os.path.join(args.output_dir, "checkpoints", f"model_{global_step}.pkl")
+                        # accelerator.unwrap_model(net_difix).save_model(outf)
+                        save_ckpt(accelerator.unwrap_model(net_difix), optimizer, outf)
+
+                    debug_image_names = [
+                        "0111_1753_000001.png", 
+                        "0118_1803_000248.png",      
+                        "FD03855.png",      
+                        "L190001.png",
+                        "L200253.png"
+                    ]
+
+                    # compute validation set L2, LPIPS
+                    if args.eval_freq > 0 and global_step % args.eval_freq == 1:
+                        # l_lpips = []
+                        log_dict = {"sample/source": [], "sample/target": [], "sample/model_output": []}
+                        for step_val, batch_val in enumerate(dl_val):
+                            # ===================== 核心修改：获取当前图像文件名 =====================
+                            img_name = batch_val["filename"][0]  # 从batch里读取图像文件名
+                            
+                            # 如果不在你指定的列表里，直接跳过
+                            if img_name not in debug_image_names:
+                                continue
+
+                            # if step_val >= args.num_samples_eval:  # 注释掉，不再限制只打印前几张
+                            #     break
+                            
+                            x_src_val = batch_val["conditioning_pixel_values"].to(accelerator.device, dtype=weight_dtype)
+                            x_tgt_val = batch_val["output_pixel_values"].to(accelerator.device, dtype=weight_dtype)
+                            B_val, V_val, C_val, H_val, W_val = x_src_val.shape
+                            assert B_val == 1, "Use batch size 1 for eval."
+                            with torch.no_grad():
+                                # forward pass
+                                x_tgt_pred_val = accelerator.unwrap_model(net_difix)(
+                                    x_src_val, prompt_tokens=batch_val["input_ids"].cuda()
+                                )
+
+                                # 可视化拼接
+                                x_src_vis = rearrange(x_src_val, "b v c h w -> b c (v h) w")[0].float().detach().cpu()
+                                x_src_vis = x_src_vis * 0.5 + 0.5
+
+                                x_tgt_vis = rearrange(x_tgt_val, "b v c h w -> b c (v h) w")[0].float().detach().cpu()
+                                x_tgt_vis = x_tgt_vis * 0.5 + 0.5
+
+                                fused_img = x_tgt_pred_val[:, 0, :, :, :]  # shape [B, C, H, W]
+                                fused_vis_single = fused_img[0].float().detach().cpu()  # 取第0个样本，shape [C, H, W]
+                                fused_vis_single = fused_vis_single * 0.5 + 0.5
+                                x_tgt_vis_pred = torch.cat([fused_vis_single, fused_vis_single], dim=1)  # shape [C, 2*H, W]
+
+                                combined = torch.cat([x_src_vis, x_tgt_vis_pred, x_tgt_vis], dim=2)
+                                output_pil = transforms.ToPILImage()(combined)
+                                
+                                # ===================== 保存文件名也带上真实图像名 =====================
+                                outf = os.path.join(output_dir, f"{global_step}_img_{img_name}_pred_target.png")
+                                output_pil.save(outf)
+
+
+                        gc.collect()
+                        torch.cuda.empty_cache()
+                    accelerator.log(logs, step=global_step)
+                    
+
+if __name__ == "__main__":
+    
+    parser = argparse.ArgumentParser()
+    # args for the loss function
+    parser.add_argument("--lambda_int_pos", default=1.0, type=float)
+    parser.add_argument("--lambda_int_neg", default=0.0, type=float)
+    parser.add_argument("--lambda_color_pos", default=1.0, type=float)
+    parser.add_argument("--lambda_color_neg", default=0.0, type=float)
+    parser.add_argument("--lambda_l2", default=2.0, type=float)
+    parser.add_argument("--lambda_lpips", default=1.0, type=float)
+
+    # dataset options
+    parser.add_argument("--dataset_path", required=True, type=str)
+    parser.add_argument("--train_image_prep", default="resized_crop_512", type=str)
+    parser.add_argument("--test_image_prep", default="resized_crop_512", type=str)
+    parser.add_argument("--prompt", default=None, type=str)
+
+    # validation eval args
+    parser.add_argument("--eval_freq", default=100, type=int)
+    parser.add_argument("--num_samples_eval", type=int, default=10, help="Number of samples to use for all evaluation")
+
+    parser.add_argument("--viz_freq", type=int, default=100, help="Frequency of visualizing the outputs.")
+    parser.add_argument("--tracker_project_name", type=str, default="difix", help="The name of the wandb project to log to.")
+    parser.add_argument("--tracker_run_name", type=str, required=True)
+
+    # details about the model architecture
+    parser.add_argument("--pretrained_model_name_or_path")
+    parser.add_argument("--revision", type=str, default=None,)
+    parser.add_argument("--variant", type=str, default=None,)
+    parser.add_argument("--tokenizer_name", type=str, default=None)
+    parser.add_argument("--lora_rank_vae", default=4, type=int)
+    parser.add_argument("--timestep", default=199, type=int)
+    parser.add_argument("--mv_unet", action="store_true")
+
+    # training details
+    parser.add_argument("--output_dir", required=True)
+    parser.add_argument("--cache_dir", default=None,)
+    parser.add_argument("--seed", type=int, default=None, help="A seed for reproducible training.")
+    parser.add_argument("--resolution", type=int, default=512,)
+    parser.add_argument("--train_batch_size", type=int, default=4, help="Batch size (per device) for the training dataloader.")
+    parser.add_argument("--num_training_epochs", type=int, default=10)
+    parser.add_argument("--max_train_steps", type=int, default=10_000,)
+    parser.add_argument("--checkpointing_steps", type=int, default=500,)
+    parser.add_argument("--gradient_accumulation_steps", type=int, default=1, help="Number of updates steps to accumulate before performing a backward/update pass.",)
+    parser.add_argument("--gradient_checkpointing", action="store_true",)
+    parser.add_argument("--learning_rate", type=float, default=5e-6)
+    parser.add_argument("--lr_scheduler", type=str, default="constant",
+        help=(
+            'The scheduler type to use. Choose between ["linear", "cosine", "cosine_with_restarts", "polynomial",'
+            ' "constant", "constant_with_warmup"]'
+        ),
+    )
+    parser.add_argument("--lr_warmup_steps", type=int, default=500, help="Number of steps for the warmup in the lr scheduler.")
+    parser.add_argument("--lr_num_cycles", type=int, default=1,
+        help="Number of hard resets of the lr in cosine_with_restarts scheduler.",
+    )
+    parser.add_argument("--lr_power", type=float, default=1.0, help="Power factor of the polynomial scheduler.")
+
+    parser.add_argument("--dataloader_num_workers", type=int, default=0,)
+    parser.add_argument("--adam_beta1", type=float, default=0.9, help="The beta1 parameter for the Adam optimizer.")
+    parser.add_argument("--adam_beta2", type=float, default=0.999, help="The beta2 parameter for the Adam optimizer.")
+    parser.add_argument("--adam_weight_decay", type=float, default=1e-2, help="Weight decay to use.")
+    parser.add_argument("--adam_epsilon", type=float, default=1e-08, help="Epsilon value for the Adam optimizer")
+    parser.add_argument("--max_grad_norm", default=1.0, type=float, help="Max gradient norm.")
+    parser.add_argument("--allow_tf32", action="store_true",
+        help=(
+            "Whether or not to allow TF32 on Ampere GPUs. Can be used to speed up training. For more information, see"
+            " https://pytorch.org/docs/stable/notes/cuda.html#tensorfloat-32-tf32-on-ampere-devices"
+        ),
+    )
+    parser.add_argument("--report_to", type=str, default="wandb",
+        help=(
+            'The integration to report the results and logs to. Supported platforms are `"tensorboard"`'
+            ' (default), `"wandb"` and `"comet_ml"`. Use `"all"` to report to all integrations.'
+        ),
+    )
+    parser.add_argument("--mixed_precision", type=str, default=None, choices=["no", "fp16", "bf16"],)
+    parser.add_argument("--enable_xformers_memory_efficient_attention", action="store_true", help="Whether or not to use xformers.")
+    parser.add_argument("--set_grads_to_none", action="store_true",)
+    
+    # resume
+    parser.add_argument("--resume", default=None, type=str)
+
+    args = parser.parse_args()
+
+    main(args)

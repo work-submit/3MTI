@@ -1,0 +1,18 @@
+{
+    "train": {
+        "target_fusion": "Path to target fusion image",
+        "target_SR": "Path to target high-resolution infrared image",
+        "image": "Path to input high-resolution visible image",
+        "ref_image": "Path to degraded, calibration-free infrared image",
+        "prompt": "visible-infrared image fusion and infrared image super-resolution",
+        "prompt_neg": "The original visible image and low-resolution infrared image"
+    },
+    "test": {
+        "target_fusion": "Path to target fusion image",
+        "target_SR": "Path to target high-resolution infrared image",
+        "image": "Path to input high-resolution visible image",
+        "ref_image": "Path to degraded, calibration-free infrared image",
+        "prompt": "visible-infrared image fusion and infrared image super-resolution",
+        "prompt_neg": "The original visible image and low-resolution infrared image"
+    }
+}
