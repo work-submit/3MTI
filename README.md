@@ -53,7 +53,7 @@ cd dataset
 python create_json.py
 ```
 
-## Semantic Extraction
+## Semantic Extraction (optional)
 Extract semantic information from the reference RGB images:
 #### Step 1: Download the pretrained models
 - Download the pretrained RAM (14M) model weight from [HuggingFace](https://huggingface.co/spaces/xinyu1205/recognize-anything/blob/main/ram_swin_large_14m.pth).
@@ -168,6 +168,9 @@ Our datasets used for training and validation are available at [pretrained weigh
 1. The proposed framework BeyondFusion supports both task-specific and joint training and inference. 
 2. For the joint inference, our model simultaneously outputs infrared-visible image fusion (IVF) and infrared super-resolution (SR) results.
 3. During the inference, the CFG scale is adjustable, where CFG_scale=1.1 is recommended in this work.
+
+## Semantic Extraction (optional)
+Extract semantic information from the high-resolution input/reference visible images (following the steps given above).
 
 ## Mode 1: Joint infrared SR and IVF
 ```bash
