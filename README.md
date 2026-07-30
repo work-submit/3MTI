@@ -139,22 +139,3 @@ accelerate launch --mixed_precision=bf16 --main_process_port 29501 --multi_gpu -
 ```
 ## 🎒 Data open source
 Our datasets used for training and validation are available at [pretrained weights and data](https://pan.sjtu.edu.cn/web/share/7df7f0df32ac4cd4eecc243f5ff95483) or [HuggingFace](https://huggingface.co/datasets/MinchongChen1002/3MTI_Datasets/tree/main).
-
-# (3M-TI Extension) BeyondFusion: Self-Aligned Latent Diffusion for Calibration-Free Infrared Super-Resolution and Infrared-Visible Fusion
-
-BeyondFusion: [arXiv](https://arxiv.org/abs/2607.24110) | [Project Page](https://xiaoyunyuan.net/index.html?project=beyondfusion)
-
-Authors: [Minchong Chen](https://scholar.google.com.hk/citations?hl=zh-CN&user=UX2ZtJcAAAAJ) | [Xiaoyun Yuan](https://xiaoyunyuan.net/) | [Minyu Cao]() | [Jianing Zhang]() | [Jun Zhang]() | [Shuyang Liu]() | [Xiaokang Yang](https://icne.sjtu.edu.cn/info/1064/1078.htm)
-
-## 🔎Framework Overview
-![BeyondFusion](fig/BeyondFusion_framework.png)
-
-## 📷Qualitative Results on Mobile Imaging System
-<p align="center">
-<img src="fig/Fusion_val.png" width="600" alt="Fusion validation results">
-</p>
-
-## 📌Downstream Pedestrian Detection
-<p align="center">
-<img src="fig/Detection.png" width="600" alt="Pedestrian detection results">
-</p>
