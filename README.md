@@ -32,7 +32,7 @@ Extract semantic information from the high-resolution input/reference visible im
 
 ## Mode 1: Joint Infrared SR and IVF
 ```bash
-conda activate 3M-TI
+conda activate 3MTI
 cd 3MTI-extension
 cd src
 cd joint_train_inference
