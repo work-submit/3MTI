@@ -20,6 +20,7 @@ Authors: [Minchong Chen](https://scholar.google.com.hk/citations?hl=zh-CN&user=U
 Our datasets used for training and validation are available at [pretrained weights and data](https://pan.sjtu.edu.cn/web/share/365c881396aeeafd63269b1ca4ca1f6f).
 
 ## 🚀Inference
+Download BeyondFusion model weights at [pretrained weights and data](https://pan.sjtu.edu.cn/web/share/365c881396aeeafd63269b1ca4ca1f6f) or [huggingface](https://huggingface.co/MinchongChen1002/BeyondFusion/tree/main).
 
 📚 Note:
 
